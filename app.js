@@ -1,5 +1,40 @@
 // listen for form submit
-document.getElementById('myForm').addEventListener('submit', saveMember);
+const inputTitle = document.getElementById('inputTitle');
+const inputID = document.getElementById('inputID');
+const inputEmail = document.getElementById('inputEmail');
+const inputName = document.getElementById('inputName');
+const inputMobile = document.getElementById('inputMobile');
+const inputTeam = document.getElementById('inputTeam');
+const submitBtn = document.getElementById('submit');
+
+const myForm = document
+  .getElementById('myForm')
+  .addEventListener('submit', saveMember);
+const addNew = document
+  .getElementById('addNew')
+  .addEventListener('click', openModal);
+const closeBtn = document
+  .getElementById('close')
+  .addEventListener('click', closeModal);
+
+window.addEventListener('click', outsideClick);
+
+const modal = document.getElementById('my-modal');
+
+function openModal() {
+  modal.style.display = 'block';
+}
+
+function closeModal() {
+  modal.style.display = 'none';
+}
+
+function outsideClick(e) {
+  if (e.target == modal) {
+    document.getElementById('myForm').reset();
+    modal.style.display = 'none';
+  }
+}
 
 function saveMember(e) {
   let inputTitle = document.getElementById('inputTitle').value;
@@ -8,6 +43,13 @@ function saveMember(e) {
   let inputName = document.getElementById('inputName').value;
   let inputMobile = document.getElementById('inputMobile').value;
   let inputTeam = document.getElementById('inputTeam').value;
+
+  if (!inputTitle || !inputEmail || !inputName || !inputEmail || !inputMobile) {
+    let error = (document.getElementById('error').innerHTML =
+      'Please complete all the fields');
+    // error.classList.add('error');
+    return false;
+  }
 
   let member = {
     title: inputTitle,
@@ -29,14 +71,38 @@ function saveMember(e) {
     localStorage.setItem('members', JSON.stringify(members));
   }
 
-  //   localStorage.setItem('test', 'Hello World');
-  //   localStorage.getItem('test');
-  //   localStorage.removeItem('test');
-  //   // Local Storage
-  //   localStorage;
-  fetchMembers();
+  document.getElementById('myForm').reset();
 
+  fetchMembers();
+  closeModal();
   e.preventDefault();
+}
+
+//View Members
+function viewMember(name) {
+  modal.style.display = 'block';
+  submitBtn.innerText = 'Edit';
+  let members = JSON.parse(localStorage.getItem('members'));
+  members.map((el) => {
+    if (el.name == name) {
+      inputTitle.value = el.title;
+      inputEmail.value = el.email;
+      inputName.value = el.name;
+      inputMobile.value = el.mobile;
+      inputTitle.readOnly = true;
+      inputEmail.readOnly = true;
+      inputName.readOnly = true;
+      inputMobile.readOnly = true;
+    }
+  });
+  if (submitBtn.innerText === 'Edit') {
+    myForm.addEventListener('click', editMember);
+  }
+}
+
+//Edit members
+function editMember() {
+  console.log('cl');
 }
 
 //Delete members
@@ -67,27 +133,26 @@ function fetchMembers() {
     let team = members[i].team;
 
     membersList.innerHTML +=
-      '<div class="well">' +
+      '<div class="member">' +
+      '<div>' +
       '<h4>' +
       name +
       '</h4>' +
-      'p' +
+      '<span>' +
       title +
-      'p' +
-      ' <a class="btn btn-success" href="#">Edit</a> ' +
+      '</span>' +
+      '</div>' +
+      '<div>' +
+      ' <a onClick="viewMember(\'' +
+      name +
+      '\')" class="btn btn-info" href="#">Details</a> ' +
+      //   ' <a onClick="editMember(\'' +
+      //   name +
+      //   '\')" class="btn btn-success" href="#">Edit</a> ' +
       ' <a onClick="deleteMember(\'' +
       name +
       '\')" class="btn btn-danger" href="#">Delete</a> ' +
-      '</div';
-
-    // membersList.innerHTML +=
-    //   '<div class="well">' +
-    //   '<h3>' +
-    //   name +
-    //   ' <a onclick="deleteBookmark(\'' +
-    //   url +
-    //   '\')" class="btn btn-danger" href="#">Delete</a> ' +
-    //   '</h3>' +
-    //   '</div>';
+      '</div>' +
+      '</div>';
   }
 }
