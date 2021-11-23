@@ -6,7 +6,7 @@ const inputName = document.getElementById('inputName');
 const inputMobile = document.getElementById('inputMobile');
 const inputTeam = document.getElementById('inputTeam');
 const submitBtn = document.getElementById('submit');
-
+let editable = true;
 const myForm = document
   .getElementById('myForm')
   .addEventListener('submit', saveMember);
@@ -22,6 +22,7 @@ window.addEventListener('click', outsideClick);
 const modal = document.getElementById('my-modal');
 
 function openModal() {
+  submitBtn.innerText = 'Add';
   modal.style.display = 'block';
 }
 
@@ -35,47 +36,58 @@ function outsideClick(e) {
     modal.style.display = 'none';
   }
 }
-
+var ids = 1;
 function saveMember(e) {
-  let inputTitle = document.getElementById('inputTitle').value;
-  let inputID = document.getElementById('inputID').value;
-  let inputEmail = document.getElementById('inputEmail').value;
-  let inputName = document.getElementById('inputName').value;
-  let inputMobile = document.getElementById('inputMobile').value;
-  let inputTeam = document.getElementById('inputTeam').value;
+  if (submitBtn.innerText === 'Edit') editMember(e);
+  else if (submitBtn.innerText === 'Save') editSave(e);
+  else {
+    let inputTitle = document.getElementById('inputTitle').value;
+    let inputID = document.getElementById('inputID').value;
+    let inputEmail = document.getElementById('inputEmail').value;
+    let inputName = document.getElementById('inputName').value;
+    let inputMobile = document.getElementById('inputMobile').value;
+    let inputTeam = document.getElementById('inputTeam').value;
 
-  if (!inputTitle || !inputEmail || !inputName || !inputEmail || !inputMobile) {
-    let error = (document.getElementById('error').innerHTML =
-      'Please complete all the fields');
-    // error.classList.add('error');
-    return false;
+    if (
+      !inputTitle ||
+      !inputEmail ||
+      !inputName ||
+      !inputEmail ||
+      !inputMobile
+    ) {
+      let error = (document.getElementById('error').innerHTML =
+        'Please complete all the fields');
+      // error.classList.add('error');
+      return false;
+    }
+
+    let member = {
+      title: inputTitle,
+      id: inputID,
+      email: inputEmail,
+      name: inputName,
+      mobile: inputMobile,
+      team: inputTeam,
+      ids: ids,
+    };
+    ids += 1;
+
+    if (localStorage.getItem('members') === null) {
+      let members = [];
+      members.push(member);
+      localStorage.setItem('members', JSON.stringify(members));
+    } else {
+      let members = JSON.parse(localStorage.getItem('members'));
+      members.push(member);
+      localStorage.setItem('members', JSON.stringify(members));
+    }
+
+    document.getElementById('myForm').reset();
+
+    fetchMembers();
+    closeModal();
+    e.preventDefault();
   }
-
-  let member = {
-    title: inputTitle,
-    id: inputID,
-    email: inputEmail,
-    name: inputName,
-    mobile: inputMobile,
-    team: inputTeam,
-  };
-  //   console.log(member);
-
-  if (localStorage.getItem('members') === null) {
-    let members = [];
-    members.push(member);
-    localStorage.setItem('members', JSON.stringify(members));
-  } else {
-    let members = JSON.parse(localStorage.getItem('members'));
-    members.push(member);
-    localStorage.setItem('members', JSON.stringify(members));
-  }
-
-  document.getElementById('myForm').reset();
-
-  fetchMembers();
-  closeModal();
-  e.preventDefault();
 }
 
 //View Members
@@ -95,33 +107,44 @@ function viewMember(name) {
       inputMobile.readOnly = true;
     }
   });
-  if (submitBtn.innerText === 'Edit') {
-    myForm.addEventListener('click', editMember);
-  }
 }
 
-//Edit members
-function editMember() {
-  console.log('cl');
-}
-
-//Delete members
-function deleteMember(name) {
-  console.log(name);
+function editSave(e) {
   let members = JSON.parse(localStorage.getItem('members'));
   members.forEach((el) => {
-    if (el.name == name) {
-      members.splice(name, 1);
+    if (el.ids === ids) {
+      el.title = inputTitle.value;
+      el.email = inputEmail.value;
+      el.name = inputName.value;
+      el.mobile = inputMobile.value;
     }
   });
   localStorage.setItem('members', JSON.stringify(members));
-  //   localStorage.removeItem()
+  fetchMembers();
+  closeModal();
+}
+
+//Edit members
+function editMember(e) {
+  inputTitle.readOnly = false;
+  inputEmail.readOnly = false;
+  inputName.readOnly = false;
+  inputMobile.readOnly = false;
+  submitBtn.innerText = 'Save';
+}
+
+//Delete members
+function deleteMember(id) {
+  let members = JSON.parse(localStorage.getItem('members'));
+  localStorage.setItem(
+    'members',
+    JSON.stringify(members.filter((item) => item.ids != id))
+  );
   fetchMembers();
 }
 
 function fetchMembers() {
   let members = JSON.parse(localStorage.getItem('members'));
-  console.log(members);
   let membersList = document.getElementById('membersList');
   membersList.innerHTML = '';
   for (let i = 0; i < members.length; i++) {
@@ -131,7 +154,7 @@ function fetchMembers() {
     let name = members[i].name;
     let mobile = members[i].mobile;
     let team = members[i].team;
-
+    let ids = members[i].ids;
     membersList.innerHTML +=
       '<div class="member">' +
       '<div>' +
@@ -150,7 +173,7 @@ function fetchMembers() {
       //   name +
       //   '\')" class="btn btn-success" href="#">Edit</a> ' +
       ' <a onClick="deleteMember(\'' +
-      name +
+      ids +
       '\')" class="btn btn-danger" href="#">Delete</a> ' +
       '</div>' +
       '</div>';

@@ -28,6 +28,7 @@ body {
 }
 
 .error {
+  text-align: center;
   color: #fff;
   font-size: 14px;
   font-weight: bold;
@@ -52,7 +53,7 @@ body {
   text-align: center;
   border-bottom: 1px solid #e5e5e5;
   /* border-radius: 10px; */
-/* } */ 
+/* } */
 .jumbotron .btn {
   padding: 5px 40px;
   font-size: 16px;
@@ -108,20 +109,19 @@ body {
 }
 
 .modal-content {
-    margin: 10% auto;
-    padding: 5%;
-    width: 60%;
-    box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 7px 20px 0 rgba(0, 0, 0, 0.17);
-    animation-name: modalopen;
-    animation-duration: var(--modal-duration);
-  }
+  margin: 10% auto;
+  padding: 5%;
+  width: 60%;
+  box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 7px 20px 0 rgba(0, 0, 0, 0.17);
+  animation-name: modalopen;
+  animation-duration: var(--modal-duration);
+}
 
-  @keyframes modalopen {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+@keyframes modalopen {
+  from {
+    opacity: 0;
   }
-  
+  to {
+    opacity: 1;
+  }
+}
