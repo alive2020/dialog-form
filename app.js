@@ -120,8 +120,8 @@ function editSave(e) {
     }
   });
   localStorage.setItem('members', JSON.stringify(members));
-  fetchMembers();
   closeModal();
+  fetchMembers();
 }
 
 //Edit members
